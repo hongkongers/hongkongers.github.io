@@ -156,7 +156,7 @@
 	<script>
 		var app = angular.module('myApp', ['ngMaterial']);
 		
-		app.controller('myCtrl', ['$scope', '$http', '$q', '$sce', '$interval', '$filter', '$window', '$mdDialog', function($scope, $http, $q, $sce, $interval, $filter, $window, $mdDialog) {
+		app.controller('myCtrl', ['$scope', '$http', '$q', '$sce', '$interval', '$filter', '$window', '$document', '$mdDialog', function($scope, $http, $q, $sce, $interval, $filter, $window, $document, $mdDialog) {
 			$scope.sce = $sce;
 		
 			$scope.webSrcs = {
@@ -434,6 +434,32 @@
 			$scope.init();
 			
 			$interval($scope.updateWebSrcs, 30000);
+			
+			$document.bind('keyup', function (e) {
+				// https://keycode.info/
+				if (e.keyCode == 27) {
+					$mdDialog.show({
+						parent: angular.element(document.body),
+						template:'<div ng-repeat="src in srcs">{{src}}</div>',
+						clickOutsideToClose: true,
+						locals: {
+							srcs: $scope.srcs.combination
+						},
+						controller: KeyUpController
+					})
+					.then(function(obj) {
+						// hide()
+					}, function() {
+						// cancel()
+					});
+					function KeyUpController($scope, $mdDialog, srcs) {
+						$scope.srcs = [];
+						angular.forEach(srcs, function(src) {
+							$scope.srcs.push(src.replace('https://www.facebook.com/plugins/video.php?href=', ''));
+						});
+					}
+				}
+			});
 		}]);
 	</script>
 	<script>
